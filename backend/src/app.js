@@ -6,8 +6,12 @@ const foodRoutes = require('./routes/food.routes');
 const foodPartnerRoutes = require('./routes/food-partner.routes');
 const cors = require('cors');
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
+    origin: ['http://localhost:5173',
+        'https://zomato-with-reels..vercel.app'
+    ],
+    credentials: true,
+    methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization']
 })); 
 app.use(cookieParser());
 app.use(express.json());

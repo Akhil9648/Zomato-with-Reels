@@ -3,153 +3,103 @@ import axios from 'axios';
 import '../../styles/reels.css';
 import ReelFeed from '../../components/ReelFeed';
 
+// Read base URL from Vite env
+const API_BASE = import.meta.env.VITE_API_URL;
+
+// Configure axios once for this module
+const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true
+});
+
 const Home = () => {
-    const [videos, setVideos] = useState([]);
-    const [isAuthenticated, setIsAuthenticated] = useState(true);
-    const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+  useEffect(() => {
     async function fetchVideos() {
-        try {
-            const response = await axios.get("http://localhost:3000/api/food", {
-                withCredentials: true,
-            });
-            console.log("📥 Videos loaded with status:", response.data.foodItems);
-            setVideos(response.data.foodItems);
-            setIsAuthenticated(true);
-        } catch (error) {
-            if (error.response?.status === 401) {
-                setIsAuthenticated(false);
-            } else {
-                console.error("Error fetching videos:", error);
-            }
-        } finally {
-            setLoading(false);
-        }
+      try {
+        const response = await api.get('/food/');
+        console.log('📥 Videos loaded:', response.data.foodItems);
+        setVideos(response.data.foodItems);
+        setIsAuthenticated(true);
+      } catch (error) {
+        if (error.response?.status === 401) setIsAuthenticated(false);
+        else console.error('Error fetching videos:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-
     fetchVideos();
-}, []);
+  }, []);
 
-
-    async function likeVideo(item) {
+  async function likeVideo(item) {
     try {
-        console.log("🟢 LIKE CLICK - Current item state:", {
-            id: item._id,
-            currentLikeCount: item.likeCount,
-            hasIsLikedField: 'isLiked' in item
-        });
+      const response = await api.post('/food/like', { foodId: item._id });
 
-        const response = await axios.post(
-            "http://localhost:3000/api/food/like",
-            { foodId: item._id },
-            { withCredentials: true }
-        );
+      // Expect backend to return both count and flag
+      const { action, likeCount, isLiked } = response.data;
 
-        console.log("🟡 BACKEND RESPONSE:", response.data);
+      setVideos(prev =>
+        prev.map(v =>
+          v._id === item._id ? { ...v, likeCount, isLiked } : v
+        )
+      );
 
-        const isNowLiked = response.data.isLiked;
-        console.log("🟡 isNowLiked from backend:", isNowLiked);
-
-        setVideos((prev) => {
-            const updated = prev.map((v) => {
-                if (v._id === item._id) {
-                    const newCount = isNowLiked
-                        ? (v.likeCount || 0) + 1
-                        : Math.max((v.likeCount || 0) - 1, 0);
-                    
-                    console.log("🟡 STATE UPDATE:", {
-                        oldCount: v.likeCount,
-                        newCount: newCount,
-                        isNowLiked: isNowLiked
-                    });
-
-                    return {
-                        ...v,
-                        likeCount: newCount
-                    };
-                }
-                return v;
-            });
-            return updated;
-        });
-
-        console.log(isNowLiked ? "✅ Video Liked!" : "❌ Video Unliked!");
+      console.log(action === 'liked' ? '✅ Video Liked!' : '❌ Video Unliked!');
     } catch (error) {
-        console.error("❌ Error liking video:", {
-            message: error.message,
-            status: error.response?.status,
-            data: error.response?.data
-        });
-        if (error.response?.status === 401) {
-            setIsAuthenticated(false);
-        }
+      console.error('❌ Error liking video:', error);
+      if (error.response?.status === 401) setIsAuthenticated(false);
     }
-}
+  }
 
-
-async function saveVideo(item) {
+  async function saveVideo(item) {
     try {
-        const response = await axios.post(
-            "http://localhost:3000/api/food/save",
-            { foodId: item._id },
-            { withCredentials: true }
-        );
+      const response = await api.post('/food/save', { foodId: item._id });
 
-        if (response.data.message === "Food saved successfully") {
-            setVideos((prev) =>
-                prev.map((v) =>
-                    v._id === item._id 
-                        ? { ...v, savesCount: (v.savesCount || 0) + 1 }  // ← Handle undefined
-                        : v
-                )
-            );
-        } else if (response.data.message === "Food unsaved successfully") {
-            setVideos((prev) =>
-                prev.map((v) =>
-                    v._id === item._id 
-                        ? { ...v, savesCount: Math.max((v.savesCount || 0) - 1, 0) }  // ← Handle undefined
-                        : v
-                )
-            );
-        }
+      // Expect backend to return both count and flag
+      const { action, savesCount, isSaved } = response.data;
+
+      setVideos(prev =>
+        prev.map(v =>
+          v._id === item._id ? { ...v, savesCount, isSaved } : v
+        )
+      );
+
+      console.log(action === 'saved' ? '✅ Video Saved!' : '❌ Video Unsaved!');
     } catch (error) {
-        console.error("Error saving video:", error);
-        if (error.response?.status === 401) {
-            setIsAuthenticated(false);
-        }
+      console.error('❌ Error saving video:', error);
+      if (error.response?.status === 401) setIsAuthenticated(false);
     }
-}
+  }
 
+  if (loading) return <p className="text-center mt-8 text-gray-500">Loading...</p>;
 
-    if (loading) {
-        return <p className="text-center mt-8 text-gray-500">Loading...</p>;
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <div className="flex flex-col items-center justify-center h-screen text-center">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                    Please login to continue
-                </h2>
-                <a
-                    href="/user/login"
-                    className="px-6 py-2 bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-700 transition"
-                >
-                    Go to Login
-                </a>
-            </div>
-        );
-    }
-
+  if (!isAuthenticated) {
     return (
-        <ReelFeed
-            items={videos}
-            onLike={likeVideo}
-            onSave={saveVideo}
-            emptyMessage="No videos available."
-        />
+      <div className="flex flex-col items-center justify-center h-screen text-center">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          Please login to continue
+        </h2>
+        <a
+          href="/user/login"
+          className="px-6 py-2 bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-700 transition"
+        >
+          Go to Login
+        </a>
+      </div>
     );
+  }
+
+  return (
+    <ReelFeed
+      items={videos}
+      onLike={likeVideo}
+      onSave={saveVideo}
+      emptyMessage="No videos available."
+    />
+  );
 };
 
 export default Home;

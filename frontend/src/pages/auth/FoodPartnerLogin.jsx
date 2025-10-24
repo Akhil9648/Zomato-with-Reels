@@ -3,8 +3,14 @@ import '../../styles/auth-shared.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const FoodPartnerLogin = () => {
+const API_BASE = import.meta.env.VITE_API_URL;
 
+const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true
+});
+
+const FoodPartnerLogin = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,17 +20,17 @@ const FoodPartnerLogin = () => {
       const email = e.target.email.value;
       const password = e.target.password.value;
 
-      const response = await axios.post("http://localhost:3000/api/auth/food-partner/login", {
+      const response = await api.post('/auth/food-partner/login', {
         email,
         password
-      }, { withCredentials: true });
+      });
 
       console.log('partner login success', response.data);
-      navigate("/create-food"); // Redirect to create food page after login
+      navigate('/create-food'); // Redirect to create food page after login
     } catch (err) {
       console.error('partner login error', err);
+      // Optional: show toast with err.response?.data?.message
     }
-
   };
 
   return (
@@ -34,6 +40,7 @@ const FoodPartnerLogin = () => {
           <h1 id="partner-login-title" className="auth-title">Partner login</h1>
           <p className="auth-subtitle">Access your dashboard and manage orders.</p>
         </header>
+
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">
             <label htmlFor="email">Email</label>
@@ -45,6 +52,7 @@ const FoodPartnerLogin = () => {
           </div>
           <button className="auth-submit" type="submit">Sign In</button>
         </form>
+
         <div className="auth-alt-action">
           New partner? <a href="/food-partner/register">Create an account</a>
         </div>
