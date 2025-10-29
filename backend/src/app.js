@@ -7,7 +7,7 @@ const foodPartnerRoutes = require('./routes/food-partner.routes');
 const cors = require('cors');
 app.use(cors({
     origin: ['http://localhost:5173',
-        'https://zomato-with-reels..vercel.app'
+        'https://zomato-with-reels.vercel.app'
     ],
     credentials: true,
     methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
