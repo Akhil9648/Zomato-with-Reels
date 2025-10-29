@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // Cookie configuration for cross-origin
 const cookieOptions = {
     httpOnly: true,
-    secure: false, // Set to true in production with HTTPS
+    secure: true, // Set to true in production with HTTPS
     sameSite: 'none', // Changed from default 'strict'
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     path: '/'
