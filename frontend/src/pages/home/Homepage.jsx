@@ -428,8 +428,8 @@ function AboutView({ setActiveTab }) {
         <AnimBox delay={300} style={{ marginTop: 56, paddingTop: 40, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', gap: 40, flexWrap: 'wrap' }}>
             {[
-              { num: '2.4', unit: 'M+', label: 'Monthly Active Users' },
-              { num: '18', unit: 'K+', label: 'Food Creators' },
+              { num: '7', unit: '', label: 'Monthly Active Users' },
+              { num: '18', unit: '', label: 'Food Creators' },
               { num: '94', unit: '%', label: 'Order Conversion via Reels' },
             ].map(s => (
               <div key={s.label}>
