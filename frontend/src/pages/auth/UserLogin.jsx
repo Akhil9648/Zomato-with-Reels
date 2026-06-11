@@ -12,8 +12,10 @@ const UserLogin = () => {
 
     const email = e.target.email.value;
     const password = e.target.password.value;
-
-    const response = await axios.post("http://localhost:3000/api/auth/user/login", {
+    axios.create({
+      baseURL: "https://zomato-with-reels.onrender.com"
+    })
+    const response = await axios.post("/api/auth/user/login", {
       email,
       password
     }, { withCredentials: true });
