@@ -17,8 +17,10 @@ const FoodPartnerRegister = () => {
     const email = e.target.email.value;
     const password = e.target.password.value;
     const address = e.target.address.value;
-
-    axios.post("http://localhost:3000/api/auth/food-partner/register", {
+    axios.create({
+      baseURL: "https://zomato-with-reels.onrender.com"
+    })
+    axios.post("/api/auth/food-partner/register", {
       name:businessName,
       contactName,
       phone,
