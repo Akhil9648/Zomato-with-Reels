@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import axios from 'axios';
+import API from '../../api/api';
 import '../../styles/create-food.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,9 +56,7 @@ const CreateFood = () => {
         formData.append('description', description);
         formData.append("mama", videoFile);
 
-        const response = await axios.post("http://localhost:3000/api/food", formData, {
-            withCredentials: true,
-        })
+        const response = await API.post("/api/food", formData)
 
         console.log(response.data);
         navigate("/feed"); // Redirect to home or another page after successful creation

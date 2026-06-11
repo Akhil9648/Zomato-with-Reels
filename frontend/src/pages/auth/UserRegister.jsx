@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/auth-shared.css';
-import axios from 'axios';
+import API from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const UserRegister = () => {
@@ -16,16 +16,10 @@ const UserRegister = () => {
         const email = e.target.email.value;
         const password = e.target.password.value;
 
-        axios.create({
-        baseURL: "https://zomato-with-reels.onrender.com"
-        })
-        const response = await axios.post("/api/auth/user/register", {
+        const response = await API.post("/api/auth/user/register", {
             fullName: firstName + " " + lastName,
             email,
             password
-        },
-        {
-            withCredentials: true
         })
 
         console.log(response.data);

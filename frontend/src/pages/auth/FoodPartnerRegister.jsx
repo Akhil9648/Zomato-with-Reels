@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/auth-shared.css';
-import axios from 'axios';
+import API from '../../api/api';
 import { useNavigate } from 'react-router-dom';
 
 const FoodPartnerRegister = () => {
@@ -17,17 +17,14 @@ const FoodPartnerRegister = () => {
     const email = e.target.email.value;
     const password = e.target.password.value;
     const address = e.target.address.value;
-    axios.create({
-      baseURL: "https://zomato-with-reels.onrender.com"
-    })
-    axios.post("/api/auth/food-partner/register", {
+    API.post("/api/auth/food-partner/register", {
       name:businessName,
       contactName,
       phone,
       email,
       password,
       address
-    }, { withCredentials: true })
+    })
       .then(response => {
         console.log(response.data);
         navigate("/create-food"); // Redirect to create food page after successful registration
